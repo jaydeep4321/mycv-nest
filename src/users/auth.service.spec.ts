@@ -1,0 +1,94 @@
+import { Test } from '@nestjs/testing';
+import { AuthService } from './auth.service';
+import { UsersService } from './users.service';
+import { User } from './user.entity';
+import { BadRequestException, NotFoundException } from '@nestjs/common';
+
+describe('AuthService', () => {
+  let service: AuthService;
+  let fakeUsersService: Partial<UsersService>;
+
+  beforeEach(async () => {
+    // Create a fake copy of the users service
+    const users: User[] = [];
+    fakeUsersService = {
+      //   find: () => Promise.resolve([]),
+      find: (email: string) => {
+        const filteredUsers = users.filter((user) => user.email === email);
+        return Promise.resolve(filteredUsers);
+      },
+      create: (email: string, password: string) => {
+        const user = {
+          id: Math.floor(Math.random() * 999999),
+          email,
+          password,
+        } as User;
+        users.push(user);
+        return Promise.resolve(user);
+      },
+    };
+
+    const module = await Test.createTestingModule({
+      providers: [
+        AuthService,
+        {
+          provide: UsersService,
+          useValue: fakeUsersService,
+        },
+      ],
+    }).compile();
+
+    service = module.get(AuthService);
+  });
+
+  it('can create an instance of auth service', async () => {
+    expect(service).toBeDefined();
+  });
+
+  it('creates a new user with a salted and hashed password', async () => {
+    const user = await service.signup('jaydeep1@gmail.com', 'pass1234');
+
+    expect(user.password).not.toEqual('pass1234');
+    const [salt, hash] = user.password.split('.');
+    expect(salt).toBeDefined();
+    expect(hash).toBeDefined();
+  });
+
+  it('throws an error if user signs up with email that is in use', async () => {
+    fakeUsersService.find = () =>
+      Promise.resolve([{ id: 1, email: 'a', password: '1' } as User]);
+    await expect(
+      service.signup('jaydeep1@gmail.com', 'pass1234'),
+    ).rejects.toThrow(BadRequestException);
+  });
+
+  it('throws if signin is called with an unused email', async () => {
+    await expect(
+      service.signin('asdflkj@asdlfkj.com', 'passdflkj'),
+    ).rejects.toThrow(NotFoundException);
+  });
+
+  it('throws if an invalid password is provided', async () => {
+    fakeUsersService.find = () =>
+      Promise.resolve([
+        { email: 'asdf@asdf.com', password: 'laskdjf' } as User,
+      ]);
+    await expect(
+      service.signin('laskdjf@alskdfj.com', 'passowrd'),
+    ).rejects.toThrow(BadRequestException);
+  });
+
+  it('retruns a user if correct password is provided', async () => {
+    fakeUsersService.find = () =>
+      Promise.resolve([
+        {
+          email: 'jaydeep1@gmail.com',
+          password:
+            'd2944e762f624e08.cb28568f97ad0a0383959206a166f11f03fd4d7097833da17291b45942c16615',
+        } as User,
+      ]);
+    const user = await service.signin('jaydeep1@gmail.com', 'pass1234');
+    // const user = await service.signup('jaydeep1@gmail.com', 'pass1234');
+    // console.log(user);
+  });
+});
