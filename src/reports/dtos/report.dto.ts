@@ -1,6 +1,5 @@
 import { Expose, Transform } from 'class-transformer';
 import { User } from '../../users/user.entity';
-import { Column } from 'typeorm';
 
 export class ReportDto {
   @Expose()
