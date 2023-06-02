@@ -1,6 +1,6 @@
 import { ContextIdFactory } from '@nestjs/core';
 import { Entity, Column, PrimaryGeneratedColumn, ManyToOne } from 'typeorm';
-import { User } from 'src/users/user.entity';
+import { User } from '../users/user.entity';
 
 console.log(User);
 
