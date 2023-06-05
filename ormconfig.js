@@ -32,7 +32,7 @@ switch (process.env.NODE_ENV) {
       host: process.env.HOST,
       port: process.env.PORT,
       database: process.env.DATABASE,
-      user: process.env.USERNAME,
+      username: process.env.USERNAME,
       password: process.env.PASSWORD,
       url: process.env.DATABASE_URL,
       migrationsRun: true,
