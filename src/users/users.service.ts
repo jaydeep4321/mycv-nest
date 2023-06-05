@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './user.entity';
+import { ResponseDto } from 'src/response.dto';
 
 @Injectable()
 export class UsersService {
@@ -13,9 +14,11 @@ export class UsersService {
     return this.repo.save(user);
   }
 
-  findOne(id: number) {
-    if (!id) {
-      return null;
+  async findOne(id: number) {
+    const user = await this.repo.findOneBy({ id });
+    // console.log(user);
+    if (!user) {
+      return new ResponseDto().sendEmpty('user not found!');
     }
     return this.repo.findOneBy({ id });
   }

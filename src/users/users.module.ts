@@ -7,6 +7,7 @@ import { AuthService } from './auth.service';
 import { User } from './user.entity';
 import { CurrentUserInterceptor } from './interceptors/current-user.interceptor';
 import { CurrentUserMiddleware } from './middlewares/current-user-middleware';
+import { ResponseDto } from 'src/response.dto';
 
 @Module({
   imports: [TypeOrmModule.forFeature([User])],
