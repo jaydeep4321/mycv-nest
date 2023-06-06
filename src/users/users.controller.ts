@@ -34,9 +34,9 @@ export class UsersController {
 
   @Get('/whoami')
   @UseGuards(AuthGuard)
-  whoAmI(@CurrrentUser() user: User, @Res() res: Response) {
+  whoAmI(@CurrrentUser() user: User) {
     console.log(user);
-    return new ResponseDto().sendSuccess('success', user, res);
+    return new ResponseDto().sendSuccess('success', user);
   }
 
   @Post('/signout')
@@ -52,38 +52,35 @@ export class UsersController {
   }
 
   @Post('/signin')
-  async signin(
-    @Body() body: CreateUserDto,
-    @Session() session: any,
-    @Res() res: Response,
-  ) {
+  async signin(@Body() body: CreateUserDto, @Session() session: any) {
     const user = await this.authService.signin(body.email, body.password);
     session.userId = user.id;
-    return new ResponseDto().sendSuccess('success', user, res);
+    return new ResponseDto().sendSuccess('success', user);
   }
 
   @Get()
-  async findAllUsers(@Query('email') email: string, @Res() res: Response) {
+  async findAllUsers(@Query('email') email: string) {
     console.log('findAllUser called!');
     const user = await this.userService.find(email);
     // console.log(user);
-    return new ResponseDto().sendSuccess('success', user, res);
+    return new ResponseDto().sendSuccess('success', user);
   }
 
+  @Serialize(UserDto)
   @Get('/:id')
-  async findUser(@Param() id: FindOneParams, @Res() res: Response) {
+  async findUser(@Param() id: FindOneParams) {
     console.log('id in controller', id.id);
 
     const user = await this.userService.findOne(id.id);
 
     // console.log(user);
     // user.password = undefined;
-    return new ResponseDto().sendSuccess('success', user, res);
+    return new ResponseDto().sendSuccess('success', user);
     // return user;
   }
 
   // @Get('/:id')
-  // async findUser(@Param('id', ParseIntPipe) id: number, @Res() res: Response) {
+  // async findUser(@Param('id', ParseIntPipe) id: number, ) {
   //   console.log('id in controller', id);
 
   //   const user = await this.userService.findOne(id);

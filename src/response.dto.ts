@@ -1,9 +1,16 @@
 import { HttpException, HttpStatus } from '@nestjs/common';
 
 export class ResponseDto {
-  sendSuccess(message: string, data: any, res: any): any {
+  sendSuccess(message: string, data: any): any {
     // console.log('function called!!', res);
-    res.status(HttpStatus.OK).json({
+    // res.status(HttpStatus.OK).json({
+    //   error: false,
+    //   statusCode: HttpStatus.OK,
+    //   message: message,
+    //   data: data,
+    // });
+
+    return JSON.stringify({
       error: false,
       statusCode: HttpStatus.OK,
       message: message,
