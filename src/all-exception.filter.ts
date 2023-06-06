@@ -5,6 +5,7 @@ import {
   HttpStatus,
 } from '@nestjs/common';
 import { HttpException } from '@nestjs/common';
+import { ErrorType } from './utils/error.enum';
 @Catch()
 export class AllExceptionsFilter implements ExceptionFilter {
   catch(exception: unknown, host: ArgumentsHost) {
@@ -18,9 +19,12 @@ export class AllExceptionsFilter implements ExceptionFilter {
     let info: any =
       exception instanceof HttpException ? exception.getResponse() : [];
     response.status(status).json({
-      error: info.error,
-      statusCode: info.statusCode,
-      message: info.message,
+      error: true,
+      statusCode: info.statusCode
+        ? info.statusCode
+        : HttpStatus.INTERNAL_SERVER_ERROR,
+      errorType: info.errorType ? info.errorType : ErrorType.GENERIC_ERROR,
+      message: info.message ? info.message : 'internal server error',
       data: info.data ? info.data : [],
     });
   }

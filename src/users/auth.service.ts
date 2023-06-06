@@ -41,11 +41,14 @@ export class AuthService {
     if (!user) {
       throw new NotFoundException('user not found');
     }
+    console.log('user ==>', user);
 
     const [salt, storedHash] = user.password.split('.');
 
     const hash = (await scrypt(password, salt, 32)) as Buffer;
 
+    // console.log('storedHash ==>', storedHash);
+    // console.log('hash ==>', hash.toString('hex'));
     if (storedHash !== hash.toString('hex')) {
       throw new BadRequestException('bad password');
     }

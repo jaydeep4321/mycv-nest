@@ -22,22 +22,15 @@ import { CurrrentUser } from './decorators/current-user.decorator';
 import { User } from './user.entity';
 import { AuthGuard } from '../guards/auth.guard';
 import { ResponseDto } from 'src/response.dto';
-import { response } from 'express';
+import { FindOneParams } from './dtos/findOneParam';
 
 @Controller('auth')
 @Serialize(UserDto)
-@Serialize(ResponseDto)
 export class UsersController {
   constructor(
     private userService: UsersService,
     private authService: AuthService,
   ) {}
-
-  // @Get('/whoami')
-  // whoAmI(@Session() session: any) {
-  //   console.log('==>', session.userId);
-  //   return this.userService.findOne(session.userId);
-  // }
 
   @Get('/whoami')
   @UseGuards(AuthGuard)
@@ -59,29 +52,45 @@ export class UsersController {
   }
 
   @Post('/signin')
-  async signin(@Body() body: CreateUserDto, @Session() session: any) {
+  async signin(
+    @Body() body: CreateUserDto,
+    @Session() session: any,
+    @Res() res: Response,
+  ) {
     const user = await this.authService.signin(body.email, body.password);
     session.userId = user.id;
-    return user;
-  }
-
-  @Get('/:id')
-  async findUser(@Param('id') id: string, @Res() res: Response) {
-    const user = await this.userService.findOne(parseInt(id));
-    // if (!user) {
-    //   // throw new NotFoundException('user not found');
-    // }
-    // return user;
-    console.log(user);
     return new ResponseDto().sendSuccess('success', user, res);
   }
 
   @Get()
   async findAllUsers(@Query('email') email: string, @Res() res: Response) {
+    console.log('findAllUser called!');
     const user = await this.userService.find(email);
     // console.log(user);
     return new ResponseDto().sendSuccess('success', user, res);
   }
+
+  @Get('/:id')
+  async findUser(@Param() id: FindOneParams, @Res() res: Response) {
+    console.log('id in controller', id.id);
+
+    const user = await this.userService.findOne(id.id);
+
+    // console.log(user);
+    // user.password = undefined;
+    return new ResponseDto().sendSuccess('success', user, res);
+    // return user;
+  }
+
+  // @Get('/:id')
+  // async findUser(@Param('id', ParseIntPipe) id: number, @Res() res: Response) {
+  //   console.log('id in controller', id);
+
+  //   const user = await this.userService.findOne(id);
+
+  //   // console.log(user);
+  //   return new ResponseDto().sendSuccess('success', user, res);
+  // }
 
   @Delete('/:id')
   async removeUser(@Param('id') id: string) {

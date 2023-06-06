@@ -1,4 +1,4 @@
-import { Injectable, NestMiddleware } from '@nestjs/common';
+import { ConsoleLogger, Injectable, NestMiddleware } from '@nestjs/common';
 import { Request, Response, NextFunction } from 'express';
 import { UsersService } from '../users.service';
 import { User } from '../user.entity';
@@ -16,15 +16,24 @@ export class CurrentUserMiddleware implements NestMiddleware {
   constructor(private usersService: UsersService) {}
 
   async use(req: Request, res: Response, next: NextFunction) {
-    console.log('middleware called');
+    // console.log('middleware called');
     const { userId } = req.session || {};
 
-    console.log(userId);
+    // console.log('user id: ==>', userId);
 
     if (userId) {
-      const user = await this.usersService.findOne(userId);
+      console.log('called here!!');
 
+      let user = await this.usersService.findOne(userId);
+
+      const { password, ...newUser } = user;
+      console.log('updated user', newUser);
+
+      user = newUser;
+
+      console.log('ended here  !!!');
       req.currentUser = user;
+      console.log('current user ==>', req.currentUser);
     }
 
     next();

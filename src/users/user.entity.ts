@@ -8,6 +8,7 @@ import {
   OneToMany,
 } from 'typeorm';
 import { Report } from '../reports/report.entity';
+import { Exclude } from 'class-transformer';
 
 console.log(Report);
 
@@ -20,6 +21,7 @@ export class User {
   email: string;
 
   @Column()
+  @Exclude()
   password: string;
 
   @Column({ default: true })

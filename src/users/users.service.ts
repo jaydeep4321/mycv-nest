@@ -14,17 +14,18 @@ export class UsersService {
     return this.repo.save(user);
   }
 
-  async findOne(id: number) {
+  async findOne(id: any) {
+    console.log('id in service', id);
     const user = await this.repo.findOneBy({ id });
     // console.log(user);
     if (!user) {
-      return new ResponseDto().sendEmpty('user not found!');
+      return new ResponseDto().sendNotFound('user not found!');
     }
     return this.repo.findOneBy({ id });
   }
 
-  find(email: string) {
-    return this.repo.find({ where: { email } });
+  async find(email: string) {
+    return await this.repo.find({ where: { email } });
   }
 
   async update(id: number, attrs: Partial<User>) {
@@ -37,6 +38,7 @@ export class UsersService {
   }
 
   async remove(id: number) {
+    console.log('id in remove:', id);
     const user = await this.findOne(id);
     if (!user) {
       throw new Error('user not found');

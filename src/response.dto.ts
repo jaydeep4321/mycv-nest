@@ -1,21 +1,20 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
-
-import { Response, request, response } from 'express';
+import { HttpException, HttpStatus } from '@nestjs/common';
 
 export class ResponseDto {
   sendSuccess(message: string, data: any, res: any): any {
     // console.log('function called!!', res);
-    res.json({
+    res.status(HttpStatus.OK).json({
       error: false,
       statusCode: HttpStatus.OK,
       message: message,
       data: data,
     });
-    console.log('completed function');
+
+    // console.log('completed function');
   }
 
   sendCreated(message: string, data: any, res: any): any {
-    res.json({
+    res.status(HttpStatus.CREATED).json({
       error: false,
       statusCode: HttpStatus.CREATED,
       message: message,
@@ -23,12 +22,12 @@ export class ResponseDto {
     });
   }
 
-  sendEmpty(message: string): any {
+  sendNotFound(message: string, errorType?: string): any {
     console.log('function called!!', message);
     throw new HttpException(
       {
-        error: true,
         statusCode: HttpStatus.NOT_FOUND,
+        errorType: errorType,
         message: message,
         data: [],
       },
@@ -38,12 +37,12 @@ export class ResponseDto {
     // console.log('completed function');
   }
 
-  sendBadRequest(message: string): any {
+  sendBadRequest(message: string, errorType?: string): any {
     console.log('called');
     throw new HttpException(
       {
-        error: true,
         statusCode: HttpStatus.BAD_REQUEST,
+        errorType: errorType,
         message: message,
         data: [],
       },
@@ -51,12 +50,12 @@ export class ResponseDto {
     );
   }
 
-  sendUnAuthorised(message: string): any {
+  sendUnAuthorised(message: string, errorType?: string): any {
     console.log('called');
     throw new HttpException(
       {
-        error: true,
         statusCode: HttpStatus.UNAUTHORIZED,
+        errorType: errorType,
         message: message,
         data: [],
       },
@@ -64,12 +63,12 @@ export class ResponseDto {
     );
   }
 
-  sendForbidden(message: string): any {
+  sendForbidden(message: string, errorType?: string): any {
     console.log('called');
     throw new HttpException(
       {
-        error: true,
         statusCode: HttpStatus.FORBIDDEN,
+        errorType: errorType,
         message: message,
         data: [],
       },
@@ -77,11 +76,11 @@ export class ResponseDto {
     );
   }
 
-  sendInternalServerError(message: string): any {
+  sendInternalServerError(message: string, errorType?: string): any {
     throw new HttpException(
       {
-        error: true,
         statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
+        errorType: errorType,
         message: message,
         data: [],
       },
