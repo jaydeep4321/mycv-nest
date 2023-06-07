@@ -1,4 +1,6 @@
 import { HttpException, HttpStatus } from '@nestjs/common';
+import { Serialize } from './interceptors/serialize.interceptor';
+import { UserDto } from './users/dtos/user.dto';
 
 export class ResponseDto {
   sendSuccess(message: string, data: any, res: any): any {

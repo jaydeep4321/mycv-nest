@@ -8,6 +8,8 @@ import { UsersModule } from './users/users.module';
 import { ReportsModule } from './reports/reports.module';
 import { User } from './users/user.entity';
 import { Report } from './reports/report.entity';
+import { LoggerMiddleware } from './logger.middleware';
+import { WinstonModule } from 'nest-winston';
 // import cookieSession from 'cookie-session';
 const cookieSession = require('cookie-session');
 const dbConfig = require('../ormconfig.js');
@@ -19,6 +21,7 @@ const dbConfig = require('../ormconfig.js');
       envFilePath: `.env.${process.env.NODE_ENV}`,
     }),
 
+    WinstonModule.forRoot({}),
     TypeOrmModule.forRoot(dbConfig),
     // TypeOrmModule.forRootAsync({
     //   inject: [ConfigService],
@@ -52,10 +55,17 @@ export class AppModule {
     console.log('cookie session middleware called');
     consumer
       .apply(
-        cookieSession({
-          keys: [this.configService.get('COOKIE_KEY')],
-        }),
+        // cookieSession({
+        //   keys: [this.configService.get('COOKIE_KEY')],
+        // }),
+        LoggerMiddleware,
       )
       .forRoutes('*');
   }
 }
+
+// export class AppModule implements NestModule {
+//   configure(consumer: MiddlewareConsumer) {
+//     consumer.apply(LoggerMiddleware).forRoutes('*');
+//   }
+// }

@@ -1,21 +1,44 @@
 import { NestFactory } from '@nestjs/core';
-import { ValidationPipe } from '@nestjs/common';
 import { AppModule } from './app.module';
 import { AllExceptionsFilter } from './all-exception.filter';
-const cookieSession = require('cookie-session');
+import * as session from 'express-session';
+import * as passport from 'passport';
+import { Request, Response, NextFunction } from 'express';
+import { Next, Req, Res } from '@nestjs/common';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-  // app.use(
-  //   cookieSession({
-  //     keys: ['this-is-key'],
-  //   }),
-  // );
-  // app.useGlobalPipes(
-  //   new ValidationPipe({
-  //     whitelist: true,
-  //   }),
-  // );
+  app.enableCors({
+    origin: 'http://localhost:4200',
+
+    // allowedHeaders: ['origin', 'x-requested-with', 'content-type', 'accept', 'authorization' ,'x-access-token' , 'access-token'],
+    // methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
+    credentials: true,
+  });
+
+  // app.use((req,res,next)=>{
+  //   res.setHeader("Access-Control-Allow-Origin","*");
+  //   res.setHeader(
+  //     "Access-Control-Allow-Header",
+  //     "Origin,X-Requested-With,Content-Type,Accept"
+  //   );
+  //   res.setHeader("Access-Control-Allow-Methods",
+  //   "GET,POST,PATCH,DELETE,OPTIONS"
+  //   );
+  // next()
+  // })
+
+  app.use(
+    session({
+      secret: 'this-is-secret-',
+      resave: false,
+      saveUninitialized: false,
+    }),
+  );
+
+  app.use(passport.initialize());
+  app.use(passport.session());
+
   app.useGlobalFilters(new AllExceptionsFilter());
   await app.listen(process.env.PORT || 3000);
 }

@@ -37,18 +37,20 @@ export class AuthService {
   }
 
   async signin(email: string, password: string) {
+    console.log('we are in signin');
+    console.log('passport email ==>', email);
+    console.log('passport password ==>', password);
     const [user] = await this.userService.find(email);
     if (!user) {
       throw new NotFoundException('user not found');
     }
-    console.log('user ==>', user);
 
+    console.log('we are here in signup with founded user ==>', user);
+    console.log('this is password of user ==>', user.password);
     const [salt, storedHash] = user.password.split('.');
 
     const hash = (await scrypt(password, salt, 32)) as Buffer;
 
-    // console.log('storedHash ==>', storedHash);
-    // console.log('hash ==>', hash.toString('hex'));
     if (storedHash !== hash.toString('hex')) {
       throw new BadRequestException('bad password');
     }

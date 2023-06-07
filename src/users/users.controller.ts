@@ -11,6 +11,9 @@ import {
   Session,
   UseGuards,
   Res,
+  Request,
+  UseInterceptors,
+  ClassSerializerInterceptor,
 } from '@nestjs/common';
 import { CreateUserDto } from './dtos/create-user.dto';
 import { UpdateUserDto } from './dtos/update-user.dto';
@@ -20,7 +23,8 @@ import { UserDto } from './dtos/user.dto';
 import { AuthService } from './auth.service';
 import { CurrrentUser } from './decorators/current-user.decorator';
 import { User } from './user.entity';
-import { AuthGuard } from '../guards/auth.guard';
+import { AuthenticatedGuard } from 'src/guards/authenticated.guard';
+import { LocalAuthGuard } from '../guards/auth.guard';
 import { ResponseDto } from 'src/response.dto';
 import { FindOneParams } from './dtos/findOneParam';
 
@@ -33,7 +37,7 @@ export class UsersController {
   ) {}
 
   @Get('/whoami')
-  @UseGuards(AuthGuard)
+  @UseGuards(AuthenticatedGuard)
   whoAmI(@CurrrentUser() user: User, @Res() res: Response) {
     console.log(user);
     return new ResponseDto().sendSuccess('success', user, res);
@@ -51,22 +55,32 @@ export class UsersController {
     return user;
   }
 
+  @UseGuards(LocalAuthGuard)
   @Post('/signin')
   async signin(
     @Body() body: CreateUserDto,
     @Session() session: any,
     @Res() res: Response,
+    @Request() req,
   ) {
-    const user = await this.authService.signin(body.email, body.password);
-    session.userId = user.id;
-    return new ResponseDto().sendSuccess('success', user, res);
+    // const user = await this.authService.signin(body.email, body.password);
+    session.userId = req.user.id;
+    return new ResponseDto().sendSuccess('success', req.user, res);
   }
 
+  // @UseGuards(AuthGuard('local'))
+  // @Post('login')
+  // async login(@Request() req) {
+  //   return req.user;
+  // }
+
+  @UseGuards(AuthenticatedGuard)
   @Get()
   async findAllUsers(@Query('email') email: string, @Res() res: Response) {
     console.log('findAllUser called!');
-    const user = await this.userService.find(email);
+    let user = await this.userService.find(email);
     // console.log(user);
+
     return new ResponseDto().sendSuccess('success', user, res);
   }
 
@@ -74,23 +88,10 @@ export class UsersController {
   async findUser(@Param() id: FindOneParams, @Res() res: Response) {
     console.log('id in controller', id.id);
 
-    const user = await this.userService.findOne(id.id);
+    let user = await this.userService.findOne(id.id);
 
-    // console.log(user);
-    // user.password = undefined;
     return new ResponseDto().sendSuccess('success', user, res);
-    // return user;
   }
-
-  // @Get('/:id')
-  // async findUser(@Param('id', ParseIntPipe) id: number, @Res() res: Response) {
-  //   console.log('id in controller', id);
-
-  //   const user = await this.userService.findOne(id);
-
-  //   // console.log(user);
-  //   return new ResponseDto().sendSuccess('success', user, res);
-  // }
 
   @Delete('/:id')
   async removeUser(@Param('id') id: string) {
