@@ -1,4 +1,9 @@
-import { MiddlewareConsumer, Module, ValidationPipe } from '@nestjs/common';
+import {
+  DynamicModule,
+  MiddlewareConsumer,
+  Module,
+  ValidationPipe,
+} from '@nestjs/common';
 import { APP_PIPE } from '@nestjs/core';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule, ConfigService } from '@nestjs/config';
@@ -10,9 +15,8 @@ import { User } from './users/user.entity';
 import { Report } from './reports/report.entity';
 import { LoggerMiddleware } from './logger.middleware';
 import { WinstonModule } from 'nest-winston';
-// import cookieSession from 'cookie-session';
-const cookieSession = require('cookie-session');
 const dbConfig = require('../ormconfig.js');
+// import { ModuleRef } from '@nestjs/core';
 
 @Module({
   imports: [
@@ -53,19 +57,6 @@ export class AppModule {
 
   configure(consumer: MiddlewareConsumer) {
     console.log('cookie session middleware called');
-    consumer
-      .apply(
-        // cookieSession({
-        //   keys: [this.configService.get('COOKIE_KEY')],
-        // }),
-        LoggerMiddleware,
-      )
-      .forRoutes('*');
+    consumer.apply(LoggerMiddleware).forRoutes('*');
   }
 }
-
-// export class AppModule implements NestModule {
-//   configure(consumer: MiddlewareConsumer) {
-//     consumer.apply(LoggerMiddleware).forRoutes('*');
-//   }
-// }

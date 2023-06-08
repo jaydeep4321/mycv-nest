@@ -3,8 +3,6 @@ import { AppModule } from './app.module';
 import { AllExceptionsFilter } from './all-exception.filter';
 import * as session from 'express-session';
 import * as passport from 'passport';
-import { Request, Response, NextFunction } from 'express';
-import { Next, Req, Res } from '@nestjs/common';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -15,18 +13,6 @@ async function bootstrap() {
     // methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
     credentials: true,
   });
-
-  // app.use((req,res,next)=>{
-  //   res.setHeader("Access-Control-Allow-Origin","*");
-  //   res.setHeader(
-  //     "Access-Control-Allow-Header",
-  //     "Origin,X-Requested-With,Content-Type,Accept"
-  //   );
-  //   res.setHeader("Access-Control-Allow-Methods",
-  //   "GET,POST,PATCH,DELETE,OPTIONS"
-  //   );
-  // next()
-  // })
 
   app.use(
     session({
