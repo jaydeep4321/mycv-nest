@@ -5,7 +5,7 @@ import { User } from './user.entity';
 import { ResponseDto } from 'src/response.dto';
 import { plainToClass } from 'class-transformer';
 import { UserDto } from './dtos/user.dto';
-import { isArray } from 'class-validator';
+// import { isArray } from 'class-validator';
 
 @Injectable()
 export class UsersService {
